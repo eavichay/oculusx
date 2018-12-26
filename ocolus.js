@@ -1,4 +1,4 @@
-const $on = 'mini-x-observers'
+const $on = 'ocolus-x-observers'
 const observing = new WeakSet();
 
 function watch (target, path = undefined, callback = undefined) {

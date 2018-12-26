@@ -1,0 +1,24 @@
+{
+  "name": "oculusx",
+  "version": "0.0.1",
+  "description": "Upgrade objects to observables",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eavichay/ocolus.git"
+  },
+  "keywords": [
+    "Observables",
+    "Javascript",
+    "State-Management"
+  ],
+  "author": "Avichay Eyal",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/eavichay/ocolus/issues"
+  },
+  "homepage": "https://github.com/eavichay/ocolus#readme"
+}
