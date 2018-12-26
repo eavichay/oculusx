@@ -9,6 +9,9 @@ yarn-error.log*
 .idea
 .vscdoe
 
+# Build
+./dist
+
 # Runtime data
 pids
 *.pid
