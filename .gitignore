@@ -10,7 +10,7 @@ yarn-error.log*
 .vscdoe
 
 # Build
-./dist
+dist
 
 # Runtime data
 pids

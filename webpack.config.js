@@ -1,6 +1,11 @@
 const path = require('path');
 
-module.exports = {
+const config = {
+    output: {
+        filename: 'index.js',
+        path: path.resolve(__dirname, 'dist')
+    },
+
     module: {
         rules: [
             {
@@ -15,14 +20,6 @@ module.exports = {
         extensions: ['.ts', '.js']
     },
 
-    entry: './src/oculusx.ts',
-
-    output: {
-        filename: 'index.js',
-        path: path.resolve(__dirname, 'dist')
-    },
-
-    mode: 'production', //process.env.NODE_ENV === 'production' ? 'production' : 'development',
 
     optimization: {
         splitChunks: {
@@ -40,3 +37,5 @@ module.exports = {
         }
     }
 };
+
+module.exports = config;

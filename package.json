@@ -4,7 +4,9 @@
   "description": "Upgrade objects to observables",
   "main": "dist/index.js",
   "scripts": {
-    "test": "mocha -r ts-node/register test/**/**.test.ts"
+    "test": "mocha -r ts-node/register test/**/**.test.ts",
+    "build": "rm -rf ./dist && webpack --mode production",
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
