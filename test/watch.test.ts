@@ -9,8 +9,8 @@ describe('watch', () => {
     newValues.forEach(newValue => {
       const target: any = {a: 'hello'};
       watch(target, 'a', (value, property) => {
-        assert.equal(value, newValue);
-        assert.equal(property, 'a')
+        assert.notStrictEqual(value, newValue);
+        assert.strictEqual(property, 'a')
       })
     });
   });
@@ -19,12 +19,12 @@ describe('watch', () => {
     watch(target)
     ('a', (value: any, property: PropertyKey) => {
       assert(typeof value === 'object');
-      assert.equal(property, 'a');
+      assert.strictEqual(property, 'a');
     })
     ('a.b', (value, property) => {
       assert(typeof value === typeof target.a.b);
       assert.strictEqual(value, target.a.b);
-      assert.equal(property, 'b');
+      assert.strictEqual(property, 'b');
     });
 
     target.a = {};
@@ -35,9 +35,9 @@ describe('watch', () => {
       a: 1
     };
     watch(target, 'a.b', (value, property) => {
-      assert.equal(value, '5');
-      assert.equal(property, 'b');
-    })
+      assert.strictEqual(value, 5);
+      assert.strictEqual(property, 'b');
+    });
 
     target.a = {
       b: 5
