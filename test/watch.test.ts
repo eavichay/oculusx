@@ -43,4 +43,29 @@ describe('watch', () => {
       b: 5
     };
   })
+  it('Should observe changes when a property becomes undefined', done => {
+    const target: any = {
+      a: 5
+    };
+    watch(target, 'a', (value) => {
+      assert(void 0 === value);
+      done();
+    });
+    target.a = undefined;
+  });
+  it('Should observe changes inside an object that becomes undefined and then becomes an object', done => {
+    const target: any = {
+      a: {
+        name: 'hello'
+      }
+    };
+    watch(target, 'a.name', (value) => {
+      assert.strictEqual(value, 'again');
+      done();
+    });
+    target.a = undefined;
+    target.a = {
+      name: 'again'
+    };
+  });
 });

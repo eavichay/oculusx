@@ -1,37 +1,36 @@
 import {$on, $off, IOculusHandler, IOculusWatcher, observing, IObservable, IOculusUnwatcher} from "./oculusx";
 
-export function convert(target:any):IObservable {
+export function convert(target: any): IObservable {
   if (observing.has(<IObservable>target)) return <IObservable>target;
 
   const observers = new Map<string, Set<Function>>();
   const values: any = {};
 
-  const unobserve: IOculusUnwatcher = function unobserve(path:string): IOculusUnwatcher {
+  const unobserve: IOculusUnwatcher = function unobserve(path: string, callback?: Function): IOculusUnwatcher {
     const chain = path.split('.');
     const [prop,] = chain;
     const set = observers.get(path);
     if (set) {
-      set.clear();
+      if (callback) {
+        set.delete(callback);
+      } else {
+        set.clear();
+      }
       const nextInChain = target[prop];
       if (typeof nextInChain === 'object' || observing.has(nextInChain)) {
-        nextInChain[$off](chain.slice(1));
+        nextInChain[$off](chain.slice(1).join('.'), callback);
       }
-      observers.delete(path);
+      if (set.size === 0) {
+        observers.delete(path);
+      }
     }
     return target[$off];
   };
 
-  const observe: IOculusWatcher = function observe(path:string, handler: IOculusHandler, invoke = false): IOculusWatcher {
+  const observe: IOculusWatcher = function observe(path: string, callback: IOculusHandler, invoke?: boolean): IOculusWatcher {
     const chain = path.split('.');
     const [prop,] = chain;
     const isNew = !observers.has(prop);
-
-    const callback: any = function () {
-      // @ts-ignore
-      return handler(...arguments);
-    };
-    callback['oculusx-origin'] = handler;
-
     let callbacks = observers.get(path);
     if (!callbacks) {
       callbacks = new Set<Function>();
@@ -62,8 +61,8 @@ export function convert(target:any):IObservable {
             convert(v);
             Array.from(observers.entries()).forEach(([path, set]) => {
               if (path.startsWith(prop + '.')) {
-                const nextProp = path.split('.')[1];
-                set.forEach(cb => v[$on](path.split('.').slice(1).join('.'), () => cb(v[nextProp], nextProp), true));
+                // const nextProp = path.split('.')[1];
+                set.forEach(cb => v[$on](path.split('.').slice(1).join('.'), cb, true));
               }
             })
           }
@@ -74,7 +73,7 @@ export function convert(target:any):IObservable {
 
     if (invoke) {
       const set = observers.get(prop);
-      set && set.forEach(cb => cb(values[path]));
+      set && set.forEach(cb => cb(values[path], prop));
     }
 
     return <IOculusWatcher>target[$on];
