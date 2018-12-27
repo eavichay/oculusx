@@ -1,6 +1,7 @@
-# ocolus
+# oculus-X
 
 Easy javascript object observing for browser and node
+> Oculus is a latin word for *eye* or *sight*
 
 ### Watching
 
@@ -104,3 +105,6 @@ It also works the same for `unwatch`.
 - Watching arrays. Currently partially working only when shift/unshift are invoked or the whole array is replaced
 - Documentation
 
+### Installation
+`npm i oculusx`
+`yarn add oculusx`
