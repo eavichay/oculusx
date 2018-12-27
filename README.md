@@ -10,7 +10,7 @@ Easy javascript object observing for browser and node
 import { watch } from 'oculusx';
 
 const appData = {
-    // empty state at first
+    // empty state at first, but it can be a fully populated object
 };
 
 watch(appData)
