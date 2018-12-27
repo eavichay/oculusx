@@ -29,6 +29,10 @@ appData.user = {
 appData.user.name = 'Jane Doe'; // user.name watcher is invoked
 
 appData.user = undefined; // both watchers are invoked
+
+appData.user = {
+    name: 'Jordan Doe' // user.name is still intact and both watchers will be invoked.
+};
 ```
 
 ### Unwatching a specific callback
