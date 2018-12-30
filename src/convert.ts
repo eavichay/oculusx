@@ -1,39 +1,89 @@
-import {$on, $off, IOculusHandler, IOculusWatcher, observing, IObservable, IOculusUnwatcher} from "./oculusx";
+import {OculusChangeHandler} from "./oculusx";
 
-export function convert(target: any): IObservable {
-  if (observing.has(<IObservable>target)) return <IObservable>target;
+type ObservableMetadata = {
+  observe: Observe,
+  unobserve: Unobserve,
+  observers: Map<Path, Set<OculusChangeHandler>>,
+  values: object
+};
 
-  const observers = new Map<string, Set<Function>>();
+type Path = string;
+
+export type Unobserve = (path?: Path, callback?: OculusChangeHandler) => Unobserve;
+export type Observe = (path: Path, callback: OculusChangeHandler, invoke?: boolean) => Observe;
+
+const registeredObservables = new WeakMap<object, ObservableMetadata>();
+
+const deadObservableExecution = function () {
+  throw new Error('Cannot watch a non-registered object');
+};
+
+export function destroy(target: object) {
+  const meta = registeredObservables.get(target);
+  registeredObservables.delete(target);
+  if (meta) {
+    meta.observe = deadObservableExecution;
+    meta.observers.clear();
+    meta.values = {};
+    return meta.unobserve;
+  }
+  return deadObservableExecution;
+}
+
+export function convert(target: any): ObservableMetadata {
+
+  let metadata = registeredObservables.get(target);
+  if (metadata) {
+    return metadata;
+  }
+
+  const observers = new Map<Path, Set<OculusChangeHandler>>();
   const values: any = {};
 
-  const unobserve: IOculusUnwatcher = function unobserve(path: string, callback?: Function): IOculusUnwatcher {
-    const chain = path.split('.');
-    const [prop,] = chain;
-    const set = observers.get(path);
-    if (set) {
-      if (callback) {
-        set.delete(callback);
-      } else {
-        set.clear();
-      }
-      const nextInChain = target[prop];
-      if (typeof nextInChain === 'object' || observing.has(nextInChain)) {
-        nextInChain[$off](chain.slice(1).join('.'), callback);
-      }
-      if (set.size === 0) {
-        observers.delete(path);
+  const unobserve: Unobserve = (path?: Path, callback?: OculusChangeHandler): Unobserve => {
+    if (typeof path === undefined) {
+      destroy(target);
+      return deadObservableExecution;
+    } else if (path) {
+      const chain = path.split('.');
+      const [prop,] = chain;
+      const set = observers.get(path);
+      if (set) {
+        if (callback) {
+          set.delete(callback);
+        } else {
+          set.clear();
+        }
+        const nextInChain = target[prop];
+        if (typeof nextInChain === 'object') {
+          const observeMethods: ObservableMetadata | undefined = registeredObservables.get(nextInChain);
+          if (observeMethods) {
+            const {unobserve} = observeMethods;
+            const path: Path = chain.slice(1).join('.');
+            if (path && unobserve !== deadObservableExecution) {
+              (<Unobserve>unobserve)(path, callback);
+            }
+          }
+        }
+        if (set.size === 0) {
+          observers.delete(path);
+        }
       }
     }
-    return target[$off];
+
+    return unobserve;
   };
 
-  const observe: IOculusWatcher = function observe(path: string, callback: IOculusHandler, invoke?: boolean): IOculusWatcher {
+  const observe: Observe = (path: string, callback: OculusChangeHandler, invoke?: boolean): Observe => {
+    if (!registeredObservables.has(target)) {
+      deadObservableExecution();
+    }
     const chain = path.split('.');
     const [prop,] = chain;
     const isNew = !observers.has(prop);
     let callbacks = observers.get(path);
     if (!callbacks) {
-      callbacks = new Set<Function>();
+      callbacks = new Set<OculusChangeHandler>();
       observers.set(path, callbacks);
     }
     callbacks.add(callback);
@@ -41,10 +91,10 @@ export function convert(target: any): IObservable {
     if (isNew) {
       const initialValue = target[prop];
       if (typeof initialValue === 'object') {
-        convert(initialValue);
+        const {observe} = convert(initialValue);
         Array.from(observers.entries()).forEach(([path, set]) => {
           if (path.startsWith(prop + '.')) {
-            set.forEach(cb => initialValue[$on](path.split('.').slice(1).join('.'), cb));
+            set.forEach(cb => observe(path.split('.').slice(1).join('.'), cb));
           }
         })
       }
@@ -58,11 +108,11 @@ export function convert(target: any): IObservable {
           const set = observers.get(prop);
           set && set.forEach(cb => cb(v, prop));
           if (typeof v === 'object') {
-            convert(v);
+            const {observe} = convert(v);
             Array.from(observers.entries()).forEach(([path, set]) => {
               if (path.startsWith(prop + '.')) {
                 // const nextProp = path.split('.')[1];
-                set.forEach(cb => v[$on](path.split('.').slice(1).join('.'), cb, true));
+                set.forEach(cb => observe(path.split('.').slice(1).join('.'), cb, true));
               }
             })
           }
@@ -73,22 +123,19 @@ export function convert(target: any): IObservable {
 
     if (invoke) {
       const set = observers.get(prop);
-      set && set.forEach(cb => cb(values[path], prop));
+      set && set.forEach(cb => cb(values[prop], prop));
     }
 
-    return <IOculusWatcher>target[$on];
+    return observe;
   };
 
-  Object.defineProperty(target, $on, {
-    value: observe,
-    enumerable: false
-  });
+  metadata = {
+    observe,
+    unobserve,
+    observers,
+    values
+  };
 
-  Object.defineProperty(target, $off, {
-    value: unobserve,
-    enumerable: false
-  });
-
-  observing.add(target);
-  return target;
+  registeredObservables.set(target, metadata);
+  return metadata;
 }

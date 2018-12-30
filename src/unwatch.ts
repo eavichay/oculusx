@@ -1,5 +1,10 @@
-import {$off, IObservable, IOculusUnwatcher} from "./oculusx";
+import {convert, destroy, Unobserve} from "./convert";
+import {OculusChangeHandler} from "./oculusx";
 
-export const unwatch = (target: IObservable, path: string, callback?: Function):IOculusUnwatcher => {
-  return target[$off](path, callback)
+export const unwatch = (target: any, path?: string, callback?: OculusChangeHandler): Unobserve => {
+  if (!path) {
+    return destroy(target);
+  }
+  const {unobserve} = convert(target);
+  return (<Unobserve>unobserve)(path, callback)
 };

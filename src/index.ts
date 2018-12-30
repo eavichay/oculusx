@@ -1,7 +1,5 @@
 export {
   watch,
   unwatch,
-  IOculusHandler,
-  IOculusWatcher,
-  IOculusUnwatcher
+  OculusChangeHandler,
 } from './oculusx';

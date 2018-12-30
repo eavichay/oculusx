@@ -17,7 +17,7 @@ describe('watch', () => {
   it('Should observe non-existing property changes', () => {
     const target: any = {};
     watch(target)
-    ('a', (value: any, property: PropertyKey) => {
+    ('a', (value: any, property?: PropertyKey) => {
       assert(typeof value === 'object');
       assert.strictEqual(property, 'a');
     })

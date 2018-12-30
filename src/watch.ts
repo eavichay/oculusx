@@ -1,11 +1,11 @@
-import {$on, IObservable, IOculusHandler} from "./oculusx";
+import {OculusChangeHandler} from "./oculusx";
 import {convert} from "./convert";
 
-export const watch = (target: object | IObservable, path?: string, callback?: IOculusHandler) => {
-  convert(target);
+export const watch = (target: object, path?: string, callback?: OculusChangeHandler) => {
+  const {observe} = convert(target);
   if (path && callback) {
-    (<IObservable>target)[$on](path, callback, false);
+    observe(path, callback, false);
   }
-  return (<IObservable>target)[$on];
+  return observe;
 };
 

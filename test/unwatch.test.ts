@@ -1,12 +1,55 @@
-import {watch, unwatch, IOculusHandler} from '../src';
+import {watch, unwatch, OculusChangeHandler} from '../src';
 
 import assert = require('assert');
 
-describe('unwatch',  () => {
+describe('unwatch', () => {
+
+  describe('De-registering', () => {
+    const target = {
+      some: {
+        path: 123
+      }
+    };
+
+    it('Should throw error when observing a de-registered target', done => {
+      const observe = watch(target)('some.path', () => {
+      });
+      unwatch(target);
+      try {
+        observe('some.path', () => {
+        })
+      } catch (err) {
+        return done();
+      }
+      done(new Error('unobserve was still executed'));
+    });
+
+    it('Should NOT throw error when un-observing a de-registered target', done => {
+      watch(target, 'some.path', () => done(new Error('Should not be invoked')));
+      unwatch(target)('bla')('a.b.c.d')()();
+      unwatch(target, 'x.y.z');
+      unwatch(target);
+      done();
+    });
+
+    it('Should allow watch after de-registering a target', done => {
+      let error: Error | undefined = new Error('Registered callback was not invoked');
+      watch(target, 'some.path', () => done(new Error('Should not be invoked')));
+      unwatch(target);
+      watch(target, 'some.path', (value) => {
+        assert.strictEqual(value, 1);
+        error = undefined;
+      });
+      target.some = {
+        path: 1
+      };
+      done(error);
+    });
+  });
 
   it('Should remove all watchers', done => {
     let fail = undefined;
-    const target:any = {
+    const target: any = {
       a: {
         b: 12345
       }
@@ -15,6 +58,29 @@ describe('unwatch',  () => {
     unwatch(target, 'a.b');
     target.a.b = 6;
     done(fail);
+  });
+
+  it('Should chain watch/unwatch functions', done => {
+    const target = {
+      a: {
+        b: 1
+      },
+      c: 2
+    };
+    const callback = () => done(new Error('Callback should not have been invoked'));
+    watch(target)
+    ('a.b', callback)
+    ('c', callback);
+
+    unwatch(target)
+    ('a.b', callback)
+    ('c');
+
+    target.a = {
+      b: 2
+    };
+    target.c = 5;
+    done();
   });
 
   it('Should not remove deep nested watchers when removing intermediate watcher', done => {
@@ -31,7 +97,7 @@ describe('unwatch',  () => {
     const callback = () => {
       done('Should be unwatched');
     };
-    const assertionCallback: IOculusHandler = (value, prop) => {
+    const assertionCallback: OculusChangeHandler = (value, prop) => {
       count++;
       if (count === 1) {
         assert.strictEqual(value, 5678);
@@ -64,14 +130,14 @@ describe('unwatch',  () => {
   });
 
   it('Should remove specific callback on a nested object', done => {
-    const target:any = {
+    const target: any = {
       a: {
         b: 12345
       }
     };
     const callback = () => {
       done('Unwatch did not work');
-    }
+    };
     watch(target, 'a.b', callback);
     watch(target, 'a.b', (value, prop) => {
       assert.strictEqual(value, 6);
