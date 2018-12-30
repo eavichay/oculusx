@@ -21,6 +21,11 @@ build/Release
 node_modules/
 jspm_packages/
 typings/
+README.md
+typings.json
+webpack.config.js
+src
+test
 .npm
 .eslintcache
 .node_repl_history
