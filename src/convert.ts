@@ -111,7 +111,6 @@ export function convert(target: any): ObservableMetadata {
             const {observe} = convert(v);
             Array.from(observers.entries()).forEach(([path, set]) => {
               if (path.startsWith(prop + '.')) {
-                // const nextProp = path.split('.')[1];
                 set.forEach(cb => observe(path.split('.').slice(1).join('.'), cb, true));
               }
             })

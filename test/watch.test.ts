@@ -3,6 +3,22 @@ import {watch} from '../src';
 import assert = require('assert');
 
 describe('watch', () => {
+  it('Should execute multiple watches', () => {
+    const target: any = {
+      a: 1234
+    };
+    let count = 0;
+    watch(target, 'a', () => count++); // #1
+    watch(target, 'a', () => count++); // #2
+    watch(target)
+    ('b.c', () => count++) // #3
+    ('b.c', () => count++) // #4
+    ('a', () => count++) // #5
+    ('b', () => target.a++); // #6 will trigger the three 'a' watchers (#7, #8, #9)
+    target.a = 5;
+    target.b = {c: 1};
+    assert.strictEqual(count, 9);
+  });
   it('Should observe on an existing property changes', () => {
     const newValues: Array<any> = ['world', 'gibberish', 'cucumber', 15, undefined, null, [], {}, /abc/g];
 
