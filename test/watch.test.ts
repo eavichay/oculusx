@@ -58,7 +58,7 @@ describe('watch', () => {
     target.a = {
       b: 5
     };
-  })
+  });
   it('Should observe changes when a property becomes undefined', done => {
     const target: any = {
       a: 5

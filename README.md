@@ -46,7 +46,7 @@ const handler_1 = (value) => {
 
 const handler_2 = (value) => {
     // do something
-}
+};
 
 watch(appData)
     ('user.name', handler_1)

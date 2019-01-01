@@ -13,7 +13,7 @@ describe('unwatch', () => {
     };
 
     it('Should throw error when observing a de-registered target', done => {
-      const observe: Observe = (<Observe>watch(target))('some.path', () => {
+      const observe: Observe = watch(target)('some.path', () => {
       });
       unwatch(target);
       try {
@@ -113,7 +113,7 @@ describe('unwatch', () => {
         });
         done();
       }
-    }
+    };
     watch(target, 'level1.level2.level3.value', assertionCallback);
     watch(target, 'level1.level2.level3', callback);
     watch(target, 'level1.level2', assertionCallback);
