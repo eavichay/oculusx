@@ -1,10 +1,10 @@
 import {OculusChangeHandler} from "./oculusx";
 
 type ObservableMetadata = {
-  observe: Observe,
-  unobserve: Unobserve,
+  observe: Observe | undefined,
+  unobserve: Unobserve | undefined,
   observers: Map<Path, Set<OculusChangeHandler>>,
-  values: object
+  values: any
 };
 
 type Path = string;
@@ -35,10 +35,16 @@ export function convert(target: any): ObservableMetadata {
   let metadata = registeredObservables.get(target);
   if (metadata) {
     return metadata;
+  } else {
+    metadata = {
+      observers: new Map<Path, Set<OculusChangeHandler>>(),
+      observe: undefined,
+      unobserve: undefined,
+      values: {}
+    };
   }
 
-  const observers = new Map<Path, Set<OculusChangeHandler>>();
-  const values: any = {};
+  const {observers, values} = metadata;
 
   const unobserve: Unobserve = (path?: Path, callback?: OculusChangeHandler): Unobserve => {
     if (typeof path === undefined) {
@@ -94,7 +100,7 @@ export function convert(target: any): ObservableMetadata {
         const {observe} = convert(initialValue);
         Array.from(observers.entries()).forEach(([path, set]) => {
           if (path.startsWith(prop + '.')) {
-            set.forEach(cb => observe(path.split('.').slice(1).join('.'), cb));
+            set.forEach(cb => (<Observe>observe)(path.split('.').slice(1).join('.'), cb));
           }
         })
       }
@@ -111,7 +117,7 @@ export function convert(target: any): ObservableMetadata {
             const {observe} = convert(v);
             Array.from(observers.entries()).forEach(([path, set]) => {
               if (path.startsWith(prop + '.')) {
-                set.forEach(cb => observe(path.split('.').slice(1).join('.'), cb, true));
+                set.forEach(cb => (<Observe>observe)(path.split('.').slice(1).join('.'), cb, true));
               }
             })
           }
@@ -128,12 +134,9 @@ export function convert(target: any): ObservableMetadata {
     return observe;
   };
 
-  metadata = {
-    observe,
-    unobserve,
-    observers,
-    values
-  };
+  metadata.observe = observe;
+  metadata.unobserve = unobserve;
+  metadata.values = values;
 
   registeredObservables.set(target, metadata);
   return metadata;
