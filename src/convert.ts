@@ -134,8 +134,8 @@ export function convert(target: any): ObservableMetadata {
     return observe;
   };
 
-  metadata.observe = observe;
-  metadata.unobserve = unobserve;
+  metadata.observe = <Observe>observe;
+  metadata.unobserve = <Unobserve>unobserve;
   metadata.values = values;
 
   registeredObservables.set(target, metadata);

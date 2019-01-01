@@ -1,6 +1,7 @@
 import {watch, unwatch, OculusChangeHandler} from '../src';
 
 import assert = require('assert');
+import {Observe} from "../src/convert";
 
 describe('unwatch', () => {
 
@@ -12,7 +13,7 @@ describe('unwatch', () => {
     };
 
     it('Should throw error when observing a de-registered target', done => {
-      const observe = watch(target)('some.path', () => {
+      const observe: Observe = (<Observe>watch(target))('some.path', () => {
       });
       unwatch(target);
       try {
@@ -68,7 +69,7 @@ describe('unwatch', () => {
       c: 2
     };
     const callback = () => done(new Error('Callback should not have been invoked'));
-    watch(target)
+    (<Observe>watch(target))
     ('a.b', callback)
     ('c', callback);
 
