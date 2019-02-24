@@ -24,7 +24,6 @@ typings/
 README.md
 typings.json
 webpack.config.js
-src
 test
 .npm
 .eslintcache

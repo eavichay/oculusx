@@ -1,11 +1,10 @@
-import {watch } from "../src";
-
-import assert = require('assert');
+const {watch} = require('../src');
+const assert = require('assert');
 
 describe('Scope', () => {
 
   it('Should not be scoped to the target object', done => {
-    const target: any = {
+    const target = {
       a: 1,
       b: 2,
       c: {
@@ -14,7 +13,7 @@ describe('Scope', () => {
     };
     function assertScope () {
       // @ts-ignore
-      const self:any = this;
+      const self = this;
       assert.notStrictEqual(self, target);
       done();
     }
@@ -27,7 +26,7 @@ describe('Scope', () => {
   });
 
   it('Should not be scoped to the target object for arrow functions', done => {
-    const target: any = {
+    const target = {
       a: 1,
       b: 2,
       c: {
@@ -36,7 +35,7 @@ describe('Scope', () => {
     };
     const assertScope = () => {
       // @ts-ignore
-      const self:any = this;
+      const self = this;
       assert.notStrictEqual(self, target);
       done();
     };

@@ -2,10 +2,14 @@
   "name": "oculusx",
   "version": "0.2.3",
   "description": "Upgrade objects to observables",
-  "main": "dist/index.js",
+  "main": "src/index.js",
+  "browser": "dist/index.js",
   "scripts": {
-    "test": "node ./node_modules/.bin/mocha --expose-gc --timeout 5000 -r ts-node/register test/**/**.test.ts",
-    "build": "rm -rf ./dist && webpack --mode production",
+    "test": "node ./node_modules/.bin/mocha --expose-gc --timeout 5000 test/**/**.test.js",
+    "build": "rm -rf ./dist && npm run build:core && npm run build:dom",
+    "build:core": "browserify ./src/oculusx.js --outfile dist/index.js -s oculusx && uglifyjs dist/index.js -o dist/index.js --source-map url",
+    "build:dom": "browserify ./src/dom/bindToElement.js --outfile dist/bind-to-element.js && uglifyjs dist/bind-to-element.js -o dist/bind-to-element.js --source-map url",
+    "postbuild": "uglifyjs dist/index.js -o dist/index.js --source-map url",
     "prepublish": "npm run build"
   },
   "repository": {
@@ -22,19 +26,12 @@
   "bugs": {
     "url": "https://github.com/eavichay/ocolus/issues"
   },
+  "globals": ["oculusx"],
   "homepage": "https://github.com/eavichay/ocolus#readme",
   "devDependencies": {
-    "@types/mocha": "^5.2.5",
-    "@types/node": "^10.12.18",
-    "@webpack-cli/init": "^0.1.2",
-    "babel-plugin-syntax-dynamic-import": "^6.18.0",
-    "mocha": "^5.2.0",
-    "nyc": "^13.1.0",
-    "ts-loader": "^5.3.2",
-    "ts-node": "^7.0.1",
-    "typescript": "^3.2.2",
-    "uglifyjs-webpack-plugin": "^2.0.1",
-    "webpack": "^4.28.2",
-    "webpack-cli": "^3.1.2"
+    "browserify": "16.2.3",
+    "mocha": "5.2.0",
+    "nyc": "13.3.0",
+    "uglify-es": "3.3.9"
   }
 }

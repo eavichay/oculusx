@@ -1,10 +1,9 @@
-import {watch} from '../src';
-
-import assert = require('assert');
+const {watch} = require('../src');
+const assert = require('assert');
 
 describe('watch', () => {
   it('Should execute multiple watches', () => {
-    const target: any = {
+    const target = {
       a: 1234
     };
     let count = 0;
@@ -20,10 +19,10 @@ describe('watch', () => {
     assert.strictEqual(count, 9);
   });
   it('Should observe on an existing property changes', () => {
-    const newValues: Array<any> = ['world', 'gibberish', 'cucumber', 15, undefined, null, [], {}, /abc/g];
+    const newValues = ['world', 'gibberish', 'cucumber', 15, undefined, null, [], {}, /abc/g];
 
     newValues.forEach(newValue => {
-      const target: any = {a: 'hello'};
+      const target = {a: 'hello'};
       watch(target, 'a', (value, property) => {
         assert.notStrictEqual(value, newValue);
         assert.strictEqual(property, 'a')
@@ -31,9 +30,9 @@ describe('watch', () => {
     });
   });
   it('Should observe non-existing property changes', () => {
-    const target: any = {};
+    const target = {};
     watch(target)
-    ('a', (value: any, property?: PropertyKey) => {
+    ('a', (value, property) => {
       assert(typeof value === 'object');
       assert.strictEqual(property, 'a');
     })
@@ -47,7 +46,7 @@ describe('watch', () => {
     target.a.b = 5;
   });
   it('Should observe non-object path that changes to object', () => {
-    const target: any = {
+    const target = {
       a: 1
     };
     watch(target, 'a.b', (value, property) => {
@@ -60,7 +59,7 @@ describe('watch', () => {
     };
   });
   it('Should observe changes when a property becomes undefined', done => {
-    const target: any = {
+    const target = {
       a: 5
     };
     watch(target, 'a', (value) => {
@@ -70,7 +69,7 @@ describe('watch', () => {
     target.a = undefined;
   });
   it('Should observe changes inside an object that becomes undefined and then becomes an object', done => {
-    const target: any = {
+    const target = {
       a: {
         name: 'hello'
       }

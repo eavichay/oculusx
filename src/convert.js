@@ -1,24 +1,32 @@
-import {OculusChangeHandler} from "./oculusx";
+/**
+ * @typedef ObservableMetadata
+ * @property {Function|undefined} observe
+ * @property {Function|undefined} unobserve,
+ * @property {Map<string, Set<Function>>} observers
+ * @property {object} [values = {}]
+ */
 
-type ObservableMetadata = {
-  observe: Observe | undefined,
-  unobserve: Unobserve | undefined,
-  observers: Map<Path, Set<OculusChangeHandler>>,
-  values: any
-};
 
-type Path = string;
+/**
+ * @type {WeakMap<object, ObservableMetadata>}
+ */
+const registeredObservables = new WeakMap();
 
-export type Unobserve = (path?: Path, callback?: OculusChangeHandler) => Unobserve;
-export type Observe = (path: Path, callback: OculusChangeHandler, invoke?: boolean) => Observe;
+/**
+ * @returns {Function}
+ */
+const noOp = () => noOp;
 
-const registeredObservables = new WeakMap<object, ObservableMetadata>();
 
 const deadObservableExecution = function () {
   throw new Error('Cannot watch a non-registered object');
 };
 
-export function destroy(target: object) {
+/**
+ * @param {object} target
+ * @returns {Function}
+ */
+function destroy(target) {
   const meta = registeredObservables.get(target);
   registeredObservables.delete(target);
   if (meta) {
@@ -27,17 +35,24 @@ export function destroy(target: object) {
     meta.values = {};
     return meta.unobserve;
   }
-  return deadObservableExecution;
+  return noOp;
 }
 
-export function convert(target: any): ObservableMetadata {
-
+/**
+ * Enables object observing on a target object
+ * @param {object} target
+ * @returns {ObservableMetadata}
+ */
+function convert(target) {
+  /**
+   * @type {ObservableMetadata}
+   */
   let metadata = registeredObservables.get(target);
   if (metadata) {
     return metadata;
   } else {
     metadata = {
-      observers: new Map<Path, Set<OculusChangeHandler>>(),
+      observers: new Map(),
       observe: undefined,
       unobserve: undefined,
       values: {}
@@ -46,10 +61,14 @@ export function convert(target: any): ObservableMetadata {
 
   const {observers, values} = metadata;
 
-  const unobserve: Unobserve = (path?: Path, callback?: OculusChangeHandler): Unobserve => {
-    if (typeof path === undefined) {
-      destroy(target);
-      return deadObservableExecution;
+  /**
+   * @param [path]
+   * @param {Function} [callback]
+   * @returns {unobserve}
+   */
+  const unobserve = (path, callback) => {
+    if (typeof path === 'undefined') {
+      return destroy(target);
     } else if (path) {
       const chain = path.split('.');
       const [prop,] = chain;
@@ -62,12 +81,12 @@ export function convert(target: any): ObservableMetadata {
         }
         const nextInChain = target[prop];
         if (typeof nextInChain === 'object') {
-          const observeMethods: ObservableMetadata | undefined = registeredObservables.get(nextInChain);
+          const observeMethods = registeredObservables.get(nextInChain);
           if (observeMethods) {
             const {unobserve} = observeMethods;
-            const path: Path = chain.slice(1).join('.');
+            const path = chain.slice(1).join('.');
             if (path && unobserve !== deadObservableExecution) {
-              (<Unobserve>unobserve)(path, callback);
+              unobserve(path, callback);
             }
           }
         }
@@ -80,7 +99,12 @@ export function convert(target: any): ObservableMetadata {
     return unobserve;
   };
 
-  const observe: Observe = (path: string, callback: OculusChangeHandler, invoke?: boolean): Observe => {
+  /**
+   * @param {string} [path]
+   * @param {Function} [callback]
+   * @param {boolean} [invoke = false]
+   */
+  const observe = (path, callback, invoke) => {
     if (!registeredObservables.has(target)) {
       deadObservableExecution();
     }
@@ -89,7 +113,10 @@ export function convert(target: any): ObservableMetadata {
     const isNew = !observers.has(prop);
     let callbacks = observers.get(path);
     if (!callbacks) {
-      callbacks = new Set<OculusChangeHandler>();
+      /**
+       * @type {Set<Function>}
+       */
+      callbacks = new Set();
       observers.set(path, callbacks);
     }
     callbacks.add(callback);
@@ -100,7 +127,7 @@ export function convert(target: any): ObservableMetadata {
         const {observe} = convert(initialValue);
         Array.from(observers.entries()).forEach(([path, set]) => {
           if (path.startsWith(prop + '.')) {
-            set.forEach(cb => (<Observe>observe)(path.split('.').slice(1).join('.'), cb));
+            set.forEach(cb => observe(path.split('.').slice(1).join('.'), cb));
           }
         })
       }
@@ -117,7 +144,7 @@ export function convert(target: any): ObservableMetadata {
             const {observe} = convert(v);
             Array.from(observers.entries()).forEach(([path, set]) => {
               if (path.startsWith(prop + '.')) {
-                set.forEach(cb => (<Observe>observe)(path.split('.').slice(1).join('.'), cb, true));
+                set.forEach(cb => observe(path.split('.').slice(1).join('.'), cb, true));
               }
             })
           }
@@ -134,10 +161,15 @@ export function convert(target: any): ObservableMetadata {
     return observe;
   };
 
-  metadata.observe = <Observe>observe;
-  metadata.unobserve = <Unobserve>unobserve;
+  metadata.observe = observe;
+  metadata.unobserve = unobserve;
   metadata.values = values;
 
   registeredObservables.set(target, metadata);
   return metadata;
 }
+
+module.exports = {
+  convert,
+  destroy
+};
