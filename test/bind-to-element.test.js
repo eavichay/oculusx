@@ -62,4 +62,22 @@ describe('bind-to-element', function () {
         });
         model.a = 'eulav-emos';
     });
+
+    it('should unsubscribe', function (done) {
+        let counter = 0;
+        const mockElement = {
+            set textContent (value) {
+                counter++;
+                if (counter > 1) {
+                    done(new Error('Should be only invoked once'));
+                }
+            }
+        };
+        const mockData = {};
+        const unsubscribe = bindToElement(mockData, mockElement, 'a');
+        mockData.a = 'Hello';
+        unsubscribe();
+        mockData.a = 'Hello';
+        done();
+    });
 });
