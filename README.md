@@ -102,6 +102,40 @@ watch(target, path, callback)
 ```
 It also works the same for `unwatch`.
 
+### DOM Binding - browser only feature
+#### Interface:
+```ts
+type NodeBindingOptions = {
+  method?: 'attribute'|'text', // defaults to 'text'
+  attribute?: string, // attribute to be changed applicable only when method is 'attribute',
+  compute?: Function // observed value can be computed before injected to the element
+};
+
+bindToElement (model: Object, target: Element, path: string, options?:NodeBindingOptions) => Function
+// returns unsubscribe function to stop binding
+```
+
+#### Example:
+```javascript
+import 'oculusx/bind-to-element';
+const someElement = document.querySelector('#myElement');
+const model = {}
+const unsubscribe = oculusx.bindToElement(model, someElement, 'path.to.data');
+model.path.to = {
+  data: 'Hello, world'
+}; // element's text changed to 'Hello, world'
+unsubscribe(); // element is no longer bound to model
+```
+
+#### Using options:
+```javascript
+const someElement = document.querySelector('#myElement');
+const unsubscribe = oculusx.bindToElement(model, someElement, 'path.to.data', {
+  method: 'attribute',
+  attribute: 'my-attr-name',
+  compute: x => x.toLowerCase()
+});
+```
 
 ## Future releases
 - Unwatching all nested pathes: `unwatch(target)('some.path.*');`
