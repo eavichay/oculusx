@@ -10,7 +10,7 @@
     "build:core": "browserify ./src/oculusx.js --outfile dist/index.js -s oculusx && uglifyjs dist/index.js -o dist/index.js --source-map url",
     "build:dom": "browserify ./src/dom/bindToElement.js --outfile dist/bind-to-element.js && uglifyjs dist/bind-to-element.js -o dist/bind-to-element.js --source-map url",
     "postbuild": "uglifyjs dist/index.js -o dist/index.js --source-map url",
-    "prepublish": "npm run build"
+    "prepublish": "npm test && npm run build"
   },
   "repository": {
     "type": "git",
