@@ -1,6 +1,6 @@
 {
   "name": "oculusx",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "Upgrade objects to observables",
   "main": "src/index.js",
   "browser": "dist/index.js",
@@ -26,7 +26,9 @@
   "bugs": {
     "url": "https://github.com/eavichay/ocolus/issues"
   },
-  "globals": ["oculusx"],
+  "globals": [
+    "oculusx"
+  ],
   "homepage": "https://github.com/eavichay/ocolus#readme",
   "devDependencies": {
     "browserify": "16.2.3",
