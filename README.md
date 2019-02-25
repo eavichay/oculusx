@@ -1,4 +1,4 @@
-# oculus-X
+# oculusx
 
 Easy javascript object observing for browser and node
 > Oculus is a latin word for *eye* or *sight*

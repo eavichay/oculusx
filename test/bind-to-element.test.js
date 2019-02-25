@@ -11,7 +11,7 @@ describe('bind-to-element', function () {
             }
         };
         const model = {};
-        const unbind = bindToElement(model, mockElement, 'a');
+        bindToElement(model, mockElement, 'a');
         model.a = 'myText';
     });
 
@@ -68,16 +68,17 @@ describe('bind-to-element', function () {
         const mockElement = {
             set textContent (value) {
                 counter++;
+                assert(value === 'Hello');
                 if (counter > 1) {
                     done(new Error('Should be only invoked once'));
                 }
             }
         };
         const mockData = {};
-        const unsubscribe = bindToElement(mockData, mockElement, 'a');
+        const unsub = bindToElement(mockData, mockElement, 'a');
         mockData.a = 'Hello';
-        unsubscribe();
-        mockData.a = 'Hello';
+        unsub();
+        mockData.a = 'Bello';
         done();
     });
 });

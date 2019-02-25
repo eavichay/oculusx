@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>dom/bindToElement.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-oculusx.html">oculusx</a><ul class='methods'><li data-type='method'><a href="module-oculusx.html#.unwatch">unwatch</a></li><li data-type='method'><a href="module-oculusx.html#.watch">watch</a></li></ul></li><li><a href="oculusx.module_DOM.html">DOM</a><ul class='methods'><li data-type='method'><a href="oculusx.module_DOM.html#~bindToElement">bindToElement</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">dom/bindToElement.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @module oculusx.DOM
+ * @requires oculusx
+ */
+
+const {watch, unwatch} = oculusx;
+
+const echo = x => x;
+
+/**
+ * @typedef NodeBindingOptions
+ * @property {'attribute'|'text'} [method = 'text']
+ * @property {string} [attribute]
+ * @property {Function} [compute]
+ */
+
+/**
+ * @param {object} model
+ * @param {Element} node
+ * @param {string} path
+ * @param {NodeBindingOptions} options
+ * @returns {Function} function to unbind the defined binding
+ *
+ * @example
+ * const element = document.getElementById('#my-element');
+ * const model = {};
+ * const unsubscribe = oculusx.bindToElement(model, element, 'path.to.watch');
+ * model.path = { to: watch: 12345 }; // DOM node changes
+ * unsubscribe();
+ * model.path.to.watch = 'Hello'; // DOM node does not change
+ */
+function bindToElement (model, node, path, options = {}) {
+    const compute = options.compute || echo;
+    const binder = (value) => {
+        switch (options.method) {
+            case 'attribute':
+                node.setAttribute(options.attribute, compute(value));
+                break;
+            default:
+            case 'text':
+                node.textContent = compute(value);
+                break;
+        }
+        if (options.callback) {
+            options.callback(value);
+        }
+    };
+    watch(model, path, binder, true);
+    return () => unwatch(model, path, binder);
+}
+
+oculusx.bindToElement = bindToElement;
+
+
+module.exports = {
+    bindToElement
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated at Mon Feb 25 2019 11:16:20 GMT+0200 (Israel Standard Time)
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

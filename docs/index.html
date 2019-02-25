@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Home - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-oculusx.html">oculusx</a><ul class='methods'><li data-type='method'><a href="module-oculusx.html#.unwatch">unwatch</a></li><li data-type='method'><a href="module-oculusx.html#.watch">watch</a></li></ul></li><li><a href="oculusx.module_DOM.html">DOM</a><ul class='methods'><li data-type='method'><a href="oculusx.module_DOM.html#~bindToElement">bindToElement</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<div id="main">
+    
+
+    
+
+
+
+    
+
+
+
+
+
+
+
+
+
+    
+
+
+    <section class="readme">
+        <article><h1>oculusx</h1><p>Easy javascript object observing for browser and node</p>
+<blockquote>
+<p>Oculus is a latin word for <em>eye</em> or <em>sight</em></p>
+</blockquote>
+<h3>Watching</h3><pre class="prettyprint source lang-javascript"><code>
+import { watch } from 'oculusx';
+
+const appData = {
+    // empty state at first, but it can be a fully populated object
+};
+
+watch(appData)
+    ('user.name', (value) => {
+        // do something when the name changes
+    })
+    ('user', (value) => {
+        // do something when the whole user object changes
+        // subscription to name remains even if the user is a whole new object and will be invoked
+    });
+
+appData.user = {
+    name: 'John Doe' // both wathcers are inboked
+};
+
+appData.user.name = 'Jane Doe'; // user.name watcher is invoked
+
+appData.user = undefined; // both watchers are invoked
+
+appData.user = {
+    name: 'Jordan Doe' // user.name is still intact and both watchers will be invoked.
+};</code></pre><h3>Unwatching a specific callback</h3><pre class="prettyprint source lang-javascript"><code>import { watch, unwatch } from 'oculusx'
+
+const handler_1 = (value) => {
+    // do something
+};
+
+const handler_2 = (value) => {
+    // do something
+};
+
+watch(appData)
+    ('user.name', handler_1)
+    ('user.name', handler_2);
+
+unwatch(appData)('user.name', handler_1);
+
+appData.user = {
+    name: 'Jaquelin Doe' // only handler_2 is invoked
+};</code></pre><h3>Unwatching all callbacks from a specific path</h3><pre class="prettyprint source lang-javascript"><code>import { watch, unwatch } from 'oculusx';
+
+watch(appData)
+    ('user', () => { /* do something useful */ }) // callback #1
+    ('user', () => { /* do something useful */ }) // callback #2
+    ('user.name', () => { /* do something useful */ }); // watch user.name
+
+unwatch(appData)('user'); // removes all user object watchers
+
+appData.user.name = 'James Doe'; // user.name watcher is invoked
+appData.user = {
+    name: 'Jimmy Doe' // Only user.name watcher is invoked
+};
+</code></pre><h3>Immediate invocation</h3><pre class="prettyprint source lang-javascript"><code>
+watch(target)(path, callback, true);
+</code></pre><h3>Alternative syntax</h3><p>For those who dislike currying syntax:</p>
+<pre class="prettyprint source lang-javascript"><code>watch(target)
+    (path, callback)
+    (path2, callback2);
+
+// equals
+watch(target, path, callback);
+watch(target, path2, callback2);
+
+// or
+watch(target, path, callback)
+    (path2, callback2);</code></pre><p>It also works the same for <code>unwatch</code>.</p>
+<h3>DOM Binding - browser only feature</h3><h4>Interface:</h4><pre class="prettyprint source lang-ts"><code>type NodeBindingOptions = {
+  method?: 'attribute'|'text', // defaults to 'text'
+  attribute?: string, // attribute to be changed applicable only when method is 'attribute',
+  compute?: Function // observed value can be computed before injected to the element
+};
+
+bindToElement (model: Object, target: Element, path: string, options?:NodeBindingOptions) => Function
+// returns unsubscribe function to stop binding</code></pre><h4>Example:</h4><pre class="prettyprint source lang-javascript"><code>import 'oculusx/bind-to-element';
+const someElement = document.querySelector('#myElement');
+const model = {}
+const unsubscribe = oculusx.bindToElement(model, someElement, 'path.to.data');
+model.path.to = {
+  data: 'Hello, world'
+}; // element's text changed to 'Hello, world'
+unsubscribe(); // element is no longer bound to model</code></pre><h4>Using options:</h4><pre class="prettyprint source lang-javascript"><code>const someElement = document.querySelector('#myElement');
+const unsubscribe = oculusx.bindToElement(model, someElement, 'path.to.data', {
+  method: 'attribute',
+  attribute: 'my-attr-name',
+  compute: x => x.toLowerCase()
+});</code></pre><h2>Future releases</h2><ul>
+<li>Unwatching all nested pathes: <code>unwatch(target)('some.path.*');</code></li>
+<li>Unwatching all pathes from an object: <code>unwatch(target, '*');</code></li>
+<li>Watching arrays. Currently partially working only when shift/unshift are invoked or the whole array is replaced</li>
+<li>Documentation</li>
+</ul>
+<h3>Installation</h3><p><code>npm i oculusx</code>
+<code>yarn add oculusx</code></p></article>
+    </section>
+
+
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated at Mon Feb 25 2019 11:16:20 GMT+0200 (Israel Standard Time)
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

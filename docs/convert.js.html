@@ -1,17 +1,57 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>convert.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-oculusx.html">oculusx</a><ul class='methods'><li data-type='method'><a href="module-oculusx.html#.unwatch">unwatch</a></li><li data-type='method'><a href="module-oculusx.html#.watch">watch</a></li></ul></li><li><a href="oculusx.module_DOM.html">DOM</a><ul class='methods'><li data-type='method'><a href="oculusx.module_DOM.html#~bindToElement">bindToElement</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">convert.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
  * @module oculusx
  * @ignore
  * @typedef ObservableMetadata
  * @property {Function|undefined} observe
  * @property {Function|undefined} unobserve,
- * @property {Map<string, Set<Function>>} observers
+ * @property {Map&lt;string, Set&lt;Function>>} observers
  * @property {object} [values = {}]
  */
 
 
 /**
  * @private
- * @type {WeakMap<object, ObservableMetadata>}
+ * @type {WeakMap&lt;object, ObservableMetadata>}
  */
 const registeredObservables = new WeakMap();
 
@@ -93,7 +133,7 @@ function convert(target) {
           if (observeMethods) {
             const {unobserve} = observeMethods;
             const path = chain.slice(1).join('.');
-            if (path && unobserve !== deadObservableExecution) {
+            if (path &amp;&amp; unobserve !== deadObservableExecution) {
               unobserve(path, callback);
             }
           }
@@ -122,7 +162,7 @@ function convert(target) {
     let callbacks = observers.get(path);
     if (!callbacks) {
       /**
-       * @type {Set<Function>}
+       * @type {Set&lt;Function>}
        */
       callbacks = new Set();
       observers.set(path, callbacks);
@@ -140,14 +180,14 @@ function convert(target) {
         })
       }
       values[prop] = initialValue;
-      typeof target === 'object' && Object.defineProperty(target, prop, {
+      typeof target === 'object' &amp;&amp; Object.defineProperty(target, prop, {
         get() {
           return values[prop]
         },
         set(v) {
           values[prop] = v;
           const set = observers.get(prop);
-          set && set.forEach(cb => cb(v, prop));
+          set &amp;&amp; set.forEach(cb => cb(v, prop));
           if (typeof v === 'object') {
             const {observe} = convert(v);
             Array.from(observers.entries()).forEach(([path, set]) => {
@@ -163,7 +203,7 @@ function convert(target) {
 
     if (invoke) {
       const set = observers.get(prop);
-      set && set.forEach(cb => cb(values[prop], prop));
+      set &amp;&amp; set.forEach(cb => cb(values[prop], prop));
     }
 
     return observe;
@@ -183,4 +223,22 @@ function convert(target) {
 module.exports = {
   convert,
   destroy
-};
+};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated at Mon Feb 25 2019 11:16:20 GMT+0200 (Israel Standard Time)
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

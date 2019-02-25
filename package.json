@@ -7,6 +7,7 @@
   "scripts": {
     "test": "node ./node_modules/.bin/mocha --expose-gc --timeout 5000 test/**/**.test.js",
     "build": "rm -rf ./dist && npm run build:core && npm run build:dom",
+    "build:docs": "rm -rf docs && jsdoc ./README.md src -r -t node_modules/latodoc -d docs",
     "build:core": "browserify ./src/oculusx.js --outfile dist/index.js -s oculusx && uglifyjs dist/index.js -o dist/index.js --source-map url",
     "build:dom": "browserify ./src/dom/bindToElement.js --outfile dist/bind-to-element.js && uglifyjs dist/bind-to-element.js -o dist/bind-to-element.js --source-map url",
     "postbuild": "uglifyjs dist/index.js -o dist/index.js --source-map url",
@@ -32,6 +33,8 @@
   "homepage": "https://github.com/eavichay/ocolus#readme",
   "devDependencies": {
     "browserify": "16.2.3",
+    "jsdoc": "^3.5.5",
+    "latodoc": "github:smeijer/latodoc",
     "mocha": "5.2.0",
     "nyc": "13.3.0",
     "uglify-es": "3.3.9"

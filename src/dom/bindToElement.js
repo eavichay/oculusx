@@ -1,3 +1,8 @@
+/**
+ * @module oculusx.DOM
+ * @requires oculusx
+ */
+
 const {watch, unwatch} = oculusx;
 
 const echo = x => x;
@@ -10,12 +15,19 @@ const echo = x => x;
  */
 
 /**
- *
  * @param {object} model
  * @param {Element} node
  * @param {string} path
- * @param {object} options
- * @returns {Function} unbind function
+ * @param {NodeBindingOptions} options
+ * @returns {Function} function to unbind the defined binding
+ *
+ * @example
+ * const element = document.getElementById('#my-element');
+ * const model = {};
+ * const unsubscribe = oculusx.bindToElement(model, element, 'path.to.watch');
+ * model.path = { to: watch: 12345 }; // DOM node changes
+ * unsubscribe();
+ * model.path.to.watch = 'Hello'; // DOM node does not change
  */
 function bindToElement (model, node, path, options = {}) {
     const compute = options.compute || echo;
