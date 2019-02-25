@@ -11,7 +11,7 @@ module.exports = {
    * @param {string} [path]
    * @param {Function} [callback]
    * @param {boolean} [invoke]
-   * @returns {Function}
+   * @returns {Observe}
    */
   watch,
 

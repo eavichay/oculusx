@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Editor - oculusx</title>
+    <script src="../dist/index.js"></script>
+    <script src="../dist/bind-to-element.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        #userName, address {
+            text-transform: capitalize;
+        }
+
+        #userEmail {
+            font-style: italic;
+        }
+
+        sub {
+            float: right;
+        }
+    </style>
+</head>
+<body class="container">
+<div class="jumbotron">
+    <h1>oculusx: DOM binding demo</h1>
+    <p>Simple model -> view binding with oculusx</p>
+    <sub>User data credit: <a href="https://randomuser.me/" target="_blank" referrerpolicy="no-referrer">https://randomuser.me</a></sub>
+</div>
+<article id="card" style="font-size: 80%; margin: 0 auto; width: 18rem" class="card invisible" style="">
+    <img id="userImage" src="" class="card-img-top" alt="User Image">
+    <div class="card-body">
+        <h5 class="card-title"><span id="userName">Card title</span> <sub id="userAge"></sub></h5>
+        <abbr id="userEmail"></abbr>
+        <address></address>
+        <label for="userPhone">Phone</label> <input name="phone" id="userPhone" readonly />
+        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
+            content.</p>
+        <button id="loadData" onclick="loadRandomUser()" href="#" class="btn btn-primary">Load random data</button>
+    </div>
+</article>
+<script>
+    const model = {};
+    const $ = v => document.querySelector(v);
+
+    function loadRandomUser() {
+        const btn = $('#loadData');
+        btn.disabled = true;
+        fetch('https://randomuser.me/api/')
+            .then(r => r.json())
+            .then(data => Object.assign(model, data.results[0]))
+            .then(() => $('#card').classList.remove('invisible'))
+            .then(() => btn.disabled = false);
+    }
+
+    const bind = (element, path, options) => oculusx.bindToElement(model, element, path, options);
+
+    bind($('#userPhone'), 'phone', {
+        attribute: 'value',
+        method: 'attribute'
+    });
+    bind($('address'), 'location', {
+        compute: ({city, postcode, state, street}) => `${street}, ${city} ${postcode}, ${state}`
+    });
+
+    bind($('#userAge'), 'dob', {
+        compute: ({age}) => 'Age: ' + age.toString()
+    });
+
+    bind($('#userEmail'), 'email');
+
+    bind($('#userName'), 'name', {
+        compute: ({first, last, title}) => `${title} ${last}, ${first}`
+    });
+
+    bind($('#userImage'), 'picture.large', {
+        method: 'attribute',
+        attribute: 'src'
+    });
+
+    loadRandomUser();
+
+
+</script>
+
+</body>
+</html>

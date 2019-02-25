@@ -6,8 +6,9 @@
   "browser": "dist/index.js",
   "scripts": {
     "test": "node ./node_modules/.bin/mocha --expose-gc --timeout 5000 test/**/**.test.js",
-    "build": "rm -rf ./dist && npm run build:core && npm run build:dom",
+    "build": "rm -rf ./dist && npm test && npm run build:core && npm run build:dom && npm run build:docs",
     "build:docs": "rm -rf docs && jsdoc ./README.md src -r -t node_modules/latodoc -d docs",
+    "postbuild:docs": "cp -R demo ./docs && cp -R dist ./docs/demo",
     "build:core": "browserify ./src/oculusx.js --outfile dist/index.js -s oculusx && uglifyjs dist/index.js -o dist/index.js --source-map url",
     "build:dom": "browserify ./src/dom/bindToElement.js --outfile dist/bind-to-element.js && uglifyjs dist/bind-to-element.js -o dist/bind-to-element.js --source-map url",
     "postbuild": "uglifyjs dist/index.js -o dist/index.js --source-map url",

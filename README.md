@@ -3,6 +3,8 @@
 Easy javascript object observing for browser and node
 > Oculus is a latin word for *eye* or *sight*
 
+[See Demo](./demo/dom/random-user.html)
+
 ### Watching
 
 ```javascript
@@ -103,6 +105,7 @@ watch(target, path, callback)
 It also works the same for `unwatch`.
 
 ### DOM Binding - browser only feature
+[Demo](./demo/dom/random-user.html)
 #### Interface:
 ```ts
 type NodeBindingOptions = {
