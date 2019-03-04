@@ -1,6 +1,6 @@
 {
   "name": "oculusx",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Upgrade objects to observables",
   "main": "src/index.js",
   "browser": "dist/index.js",
