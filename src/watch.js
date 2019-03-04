@@ -20,10 +20,10 @@ module.exports = {
    * @returns {Observe} watch function scoped to target object only
    *
    */
-  watch: (target, path, callback, invoke) => {
+  watch: (target, path = undefined, callback = undefined, invoke = false) => {
     const {observe} = convert(target);
     if (path && callback) {
-      observe(path, callback, false, invoke);
+      observe(path, callback, invoke);
     }
     return observe;
   }

@@ -3,27 +3,50 @@ global.oculusx = require('../src/index.js');
 require('../src/dom/bindToElement.js');
 
 describe('bind-to-element', function () {
+    let count = 0;
     const {bindToElement} = oculusx;
     it('should bind a model to element\'s inner-text', function () {
         const mockElement = {
             set textContent (value) {
-                assert.strictEqual('myText', value);
+                switch (count) {
+                    case 0:
+                        assert.strictEqual('initialText', value);
+                        break;
+                    case 1:
+                        assert.strictEqual('myText', value);
+                        break;
+                    default:
+                        throw new Error('Should not occur');
+                }
+                count++;
             }
         };
-        const model = {};
+        const model = {a: 'initialText'};
         bindToElement(model, mockElement, 'a');
         model.a = 'myText';
     });
 
-    it('should bind a model to element\' inner-text with computed value', function (done) {
+    it('should bind a model to element\' inner-text with computed value', function () {
+        let count = 0;
         const mockElement = {
             set textContent (value) {
-                assert.strictEqual('MYTEXT', value);
-                done();
+                switch (count) {
+                    case 0:
+                        assert.strictEqual('INITIAL', value);
+                        break;
+                    case 1:
+                        assert.strictEqual('MYTEXT', value);
+                        break;
+                    default:
+                        throw new Error('Should not occur');
+                }
+                count++;
             }
         };
         const capitalize = x => x.toUpperCase();
-        const model = {};
+        const model = {
+            a: 'initial'
+        };
         bindToElement(model, mockElement, 'a', {
             compute: capitalize
         });
@@ -38,12 +61,13 @@ describe('bind-to-element', function () {
                 done();
             }
         };
-        const model = {};
+        const model = {
+            a: 'some-value'
+        };
         bindToElement(model, mockElement, 'a', {
             method: 'attribute',
             attribute: 'some-attr'
         });
-        model.a = 'some-value';
     });
 
     it('Should set attribute - computed', function (done) {
@@ -54,22 +78,23 @@ describe('bind-to-element', function () {
                 done();
             }
         };
-        const model = {};
+        const model = {
+            a: 'eulav-emos'
+        };
         bindToElement(model, mockElement, 'a', {
             method: 'attribute',
             attribute: 'some-attr',
             compute: x => x.split('').reverse().join('')
         });
-        model.a = 'eulav-emos';
     });
 
     it('should unsubscribe', function (done) {
         let counter = 0;
         const mockElement = {
             set textContent (value) {
+                assert.equal(value, counter === 0 ? undefined : counter === 1 ? 'Hello' : new Error('Ooops'))
                 counter++;
-                assert(value === 'Hello');
-                if (counter > 1) {
+                if (counter > 2) {
                     done(new Error('Should be only invoked once'));
                 }
             }
