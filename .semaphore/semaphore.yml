@@ -5,16 +5,10 @@ agent:
     type: e1-standard-2
     os_image: ubuntu1804
 blocks:
-  - name: "Setup"
+  - name: "Test"
     task:
       jobs:
-        - name: install
+        - name: Test
           commands:
           -  checkout
           - "npm install"
-  - name: "Unit tests"
-    task:
-      jobs:
-      - name: RSpec
-        commands:
-          - "npm test"
