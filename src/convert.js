@@ -135,7 +135,7 @@ function convert(target) {
         const {observe} = convert(initialValue);
         Array.from(observers.entries()).forEach(([path, set]) => {
           if (path.startsWith(prop + '.')) {
-            set.forEach(cb => observe(path.split('.').slice(1).join('.'), cb));
+            set.forEach(cb => observe(path.split('.').slice(1).join('.'), cb, invoke));
           }
         })
       }

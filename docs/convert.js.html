@@ -175,7 +175,7 @@ function convert(target) {
         const {observe} = convert(initialValue);
         Array.from(observers.entries()).forEach(([path, set]) => {
           if (path.startsWith(prop + '.')) {
-            set.forEach(cb => observe(path.split('.').slice(1).join('.'), cb));
+            set.forEach(cb => observe(path.split('.').slice(1).join('.'), cb, invoke));
           }
         })
       }
@@ -235,7 +235,7 @@ module.exports = {
 <br class="clear">
 
 <footer>
-    Documentation generated at Mon Mar 04 2019 16:59:23 GMT+0200 (Israel Standard Time)
+    Documentation generated at Thu Mar 07 2019 20:31:34 GMT+0200 (Israel Standard Time)
 </footer>
 
 <script>prettyPrint();</script>
