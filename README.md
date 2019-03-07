@@ -1,4 +1,4 @@
-# oculusx
+# oculusx [![Build Status](https://semaphoreci.com/api/v1/eavichay/oculusx/branches/master/badge.svg)](https://semaphoreci.com/eavichay/oculusx)
 
 Easy javascript object observing for browser and node
 > Oculus is a latin word for *eye* or *sight*
