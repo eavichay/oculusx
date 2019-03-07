@@ -59,17 +59,17 @@
         method: 'attribute'
     });
     bind($('address'), 'location', {
-        compute: ({city = '', postcode = '', state = '', street = ''}) => `${street}, ${city} ${postcode}, ${state}`
+        compute: ({city = '', postcode = '', state = '', street = ''} = {}) => `${street}, ${city} ${postcode}, ${state}`
     });
 
     bind($('#userAge'), 'dob', {
-        compute: ({age = ''}) => 'Age: ' + age.toString()
+        compute: ({age = ''} = {}) => 'Age: ' + age.toString()
     });
 
     bind($('#userEmail'), 'email');
 
     bind($('#userName'), 'name', {
-        compute: ({first = '', last = '', title = ''}) => `${title} ${last}, ${first}`
+        compute: ({first = '', last = '', title = ''} = {}) => `${title} ${last}, ${first}`
     });
 
     bind($('#userImage'), 'picture.large', {
