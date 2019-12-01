@@ -21,11 +21,11 @@ watch(appData)
     })
     ('user', (value) => {
         // do something when the whole user object changes
-        // subscription to name remains even if the user is a whole new object and will be invoked
+        // subscription to name remains and will be invoked even if user was assigned with a new object
     });
 
 appData.user = {
-    name: 'John Doe' // both wathcers are inboked
+    name: 'John Doe' // both watchers are invoked
 };
 
 appData.user.name = 'Jane Doe'; // user.name watcher is invoked
